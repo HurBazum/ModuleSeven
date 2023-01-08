@@ -10,7 +10,8 @@
         
         private double price;
 
-        //если количество товара в наличии меньше, чем пользователь хочет заказать, то в заказ включается только то, что есть
+        //если количество товара в наличии меньше, чем пользователь хочет заказать,
+        //то в заказ включается только то, что есть
         public Order(TDelivery delivery, int number)
         {
             Delivery = delivery;
@@ -38,7 +39,8 @@
         }
         public override string ToString()
         {
-            return $"Вы заказали {NumberProducts} {Delivery.Product.Name} на сумму {price:C2}. Статус заказа - {OrderStatus}.";
+            return $"Вы заказали {NumberProducts} {Delivery.Product.Name} " +
+                $"на сумму {price:C2}. Статус заказа - {OrderStatus}.";
         }
     }
 }

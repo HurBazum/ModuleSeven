@@ -68,19 +68,23 @@ namespace ModuleSeven
             Delivery delivery = null;
             string enterNum = "";
             Order<Delivery, int> order = null;
+
             //создание ассортимента
             Random For_Products = new();
-            int AmountAvailableProducts = For_Products.Next(10, 20);
+            int AmountAvailableProducts = For_Products.Next(10, 20);//генерируется количество продуктов
             List<Product> Products = new List<Product>();
+            //заполнение списка продуктов
             for (int i = 0; i < AmountAvailableProducts; i++)
             {
-                if (For_Products.Next(0, 2) == 0)
+                if (For_Products.Next(0, 2) == 0)//создается продукт со скидкой
                 {
-                    Products.Add(new(Math.Round(For_Products.NextDouble(), 2) + For_Products.Next(100, 10000), For_Products.Next(1, 21), For_Products.Next(10, 30)));
+                    Products.Add(new(Math.Round(For_Products.NextDouble(), 2) 
+                        + For_Products.Next(100, 10000), For_Products.Next(1, 21), For_Products.Next(10, 30)));
                 }
-                else
+                else//без скидки
                 {
-                    Products.Add(new(Math.Round(For_Products.NextDouble(), 2) + For_Products.Next(100, 10000), For_Products.Next(1, 21)));
+                    Products.Add(new(Math.Round(For_Products.NextDouble(), 2) 
+                        + For_Products.Next(100, 10000), For_Products.Next(1, 21)));
                 }
             }
             //вывод ассортимента на экран
