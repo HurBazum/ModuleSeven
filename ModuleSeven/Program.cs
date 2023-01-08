@@ -13,46 +13,6 @@ namespace ModuleSeven
         OnItsWay,
         CanGet
     }
-    class Product
-    {
-        //имена продукции создаются рандомно
-        Random ProductRandomName = new Random();
-        string name;
-        public string Name
-        {
-            get { return name; }
-            private set
-            {
-                value = "";
-                int NameLength = ProductRandomName.Next(3, 10);
-                for (int i = 0; i < NameLength; i++)
-                {
-                    value += (char)ProductRandomName.Next(65, 91);
-                }
-                name = value;
-            }
-        }
-        public double Price { get; set; }
-        public int Count { get; set; }
-        public double Discount;
-        public Product(double price, int count, double discount = default)
-        {
-            Name = Name;
-            Price = price;
-            Count = count;
-            Discount = discount;
-        }
-        public void ChangeCount(int count)
-        {
-            Count += count;
-        }
-        public override string ToString()
-        {
-            return (Discount != default) 
-                ? $"{Name,9} стоит {Price, 3}, скидка = {Discount}%, в наличии {Count}"
-                    : $"{Name,9} стоит {Price, 3}, скидок нет, в наличии {Count}";
-        }
-    }
     abstract class Delivery
     {
         public string Address;
@@ -60,10 +20,12 @@ namespace ModuleSeven
         public DateTime DeliveryDate;
         public int DaysForDeliver;
         public Product Product;
-        public Delivery(string address, Product product)
+        public Delivery(string address, ref Product product)//Product передаётся по ссылке, чтобы изменить его переменную IsOrder,
+                                                            //чтобы при удачном заказе, уменьшилось его кол-во в магазине
         {
             Address = address;
             Product = product;
+            product.IsOrdered = true;
         }
         public override string ToString()
         {
@@ -72,63 +34,28 @@ namespace ModuleSeven
     }
     class HomeDelivery : Delivery
     {
-        public HomeDelivery(string address, Product product)
-            : base(address, product) 
+        public HomeDelivery(string address, ref Product product)
+            : base(address, ref product) 
         { 
             Price = 500;
-
         }
     }
 
     class PickPointDelivery : Delivery
     {
-        public PickPointDelivery(string address, Product product)
-            : base(address, product) { Price = 200; }
+        public PickPointDelivery(string address, ref Product product)
+            : base(address, ref product) 
+        { 
+            Price = 200;
+        }
     }
 
     class ShopDelivery : Delivery
     {
-        public ShopDelivery(string address, Product product)
-            : base(address, product) { Price = 0; }
-    }
-
-    class Order<TDelivery, TStruct> where TDelivery : Delivery
-    {
-        public TDelivery Delivery;
-        public int NumberProducts { get; set; }//кол-во заказываемого товара
-        public string Description;//название продукта_заказанное количество
-        public OrderStatus OrderStatus;//статус заказа
-        
-        private double price;
-
-        //если количество товара в наличии меньше, чем пользователь хочет заказать, то в заказ включается только то, что есть
-        public Order(TDelivery delivery, int number)
-        {
-            Delivery = delivery;
-            NumberProducts = number;
-            Description = $"{delivery.Product.Name}_{NumberProducts}";
-            //расчёт цены заказа в зависимости от наличия скидки
-            price = (Delivery.Product.Discount != 0)
-                ? Delivery.Product.Price * ((1 - (Delivery.Product.Discount / 100.00)) * NumberProducts) + 
-                    Delivery.Price : (Delivery.Product.Price * NumberProducts) + Delivery.Price;
-            //заказ поступил в работу
-            OrderStatus = OrderStatus.Build;
-        }
-
-        public void DisplayAddress()
-        {
-            Console.WriteLine(Delivery.Address);
-        }
-        public void ChangeDeliveryStatus()
-        {
-            if (OrderStatus != OrderStatus.CanGet)
-            {
-                OrderStatus++;
-            }
-        }
-        public override string ToString()
-        {
-            return $"Вы заказали {NumberProducts} {Delivery.Product.Name} на сумму {price:C2}. Статус заказа - {OrderStatus}.";
+        public ShopDelivery(string address, ref Product product)
+            : base(address, ref product) 
+        { 
+            Price = 0; 
         }
     }
     class Program
@@ -166,11 +93,14 @@ namespace ModuleSeven
             CreateOrder(ref order, Products, delivery, enterProduct, enterNum, enterAddress);
             Console.WriteLine(order.ToString());
             Console.WriteLine(order.Description);
+
         }
+        //методы для заполнения полей классов, с проверкой корректного ввода 
+        //
         static void CreateOrder(ref Order<Delivery, int> order, List<Product> Products, 
             Delivery delivery, string enterProduct, string enterNum, string enterAddress)
         {
-            Console.WriteLine("Итак, чтобы совершить, нужно ответить на несколько вопросов!");
+            Console.WriteLine("Итак, чтобы совершить заказ, нужно ответить на несколько вопросов!");
             Console.Write("Введите название товара: ");
 
             do
@@ -178,31 +108,40 @@ namespace ModuleSeven
                 DltSmthg._setCursorPosition(out int x, out int y);
                 enterProduct = Console.ReadLine();
                 enterProduct = enterProduct.ToUpper();
-                if (Products.Find(x => x.Name == enterProduct) != null)
+                var gottenProduct = Products.Find(x => x.Name == enterProduct);//поиск товара с введенным названием в Products,
+                                                                               //если такого нет - возвращает null
+                if (gottenProduct != null)
                 {
-                    EnterNumberProducts(out int count, Products, enterProduct, enterNum);
 
+                    EnterNumberProducts(out int count, Products, enterProduct, enterNum);//запрос ввода кол-ва продуктов в заказ, кол-во должно быть 
+                                                                                         //отличным от ноля и не больше, чем имеется в магазине
+                    EnterNumber(out int choice, enterNum);//выбор места доставки
 
-                    EnterNumber(out int choice, enterNum);
-                    switch (choice)
+                    switch (choice)//создание экземпляра класса доставки, с предварительным вводом адреса
                     {
                         case 1:
                             EnterAddress(ref enterAddress);
-                            delivery = new ShopDelivery(enterAddress, Products.Find(x => x.Name == enterProduct));
+                            delivery = new ShopDelivery(enterAddress, ref gottenProduct);
                             break;
 
                         case 2:
                             EnterAddress(ref enterAddress);
-                            delivery = new PickPointDelivery(enterAddress, Products.Find(x => x.Name == enterProduct));
+                            delivery = new PickPointDelivery(enterAddress, ref gottenProduct);
                             break;
 
                         case 3:
                             EnterAddress(ref enterAddress);
-                            delivery = new HomeDelivery(enterAddress, Products.Find(x => x.Name == enterProduct));
+                            delivery = new HomeDelivery(enterAddress, ref gottenProduct);
                             break;
                     }
 
                     order = new(delivery, count);
+                    //уменьшаем количество данного товара на количество в заказе,
+                    //после меняем значение Product.IsOrdered на false,
+                    //чтобы можно было увелить количество товара
+                    //с помощью того же метода ChangeCount
+                    gottenProduct.ChangeCount(order.NumberProducts);
+                    gottenProduct.IsOrdered = default;
                 }
                 else
                 {
