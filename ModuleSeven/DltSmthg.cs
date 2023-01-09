@@ -1,4 +1,6 @@
-﻿namespace DeleteLib
+﻿using ModuleSeven;
+
+namespace DeleteLib
 {
     //класс для удаления неточного ввода
     //запомнит позицию курсора до начала

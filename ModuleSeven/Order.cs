@@ -37,6 +37,13 @@
                 OrderStatus++;
             }
         }
+        public void ChangeDate(DateTime NewDeliveryDate)
+        {
+            if (Delivery is HomeDelivery)
+            {
+                Delivery.deliveryDate = NewDeliveryDate;
+            }
+        }
         public override string ToString()
         {
             return $"Вы заказали {NumberProducts} {Delivery.Product.Name} " +

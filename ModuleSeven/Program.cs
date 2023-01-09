@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using DeleteLib;
@@ -16,11 +17,13 @@ namespace ModuleSeven
     abstract class Delivery
     {
         public string Address;
+        public string DeliveryType;
         public double Price;
-        public DateTime DeliveryDate;
+        public DateTime deliveryDate;
         public int DaysForDeliver;
         public Product Product;
-        public Delivery(string address, ref Product product)//Product передаётся по ссылке, чтобы изменить его переменную IsOrder,
+        public Delivery(string address, ref Product product)//Product передаётся по ссылке,
+                                                            //чтобы изменить его переменную IsOrder,
                                                             //чтобы при удачном заказе, уменьшилось его кол-во в магазине
         {
             Address = address;
@@ -29,36 +32,64 @@ namespace ModuleSeven
         }
         public override string ToString()
         {
-            return $"Адрес - {Address}\nСтоимость - {Price}";
+            return $"{DeliveryType}\n{Address}\n{deliveryDate}\n{Product.ToString()}";
         }
     }
     class HomeDelivery : Delivery
     {
+        private int MinDaysForDelivery = 10;
+        public DateTime DeliveryDate
+        {
+            get
+            {
+                return deliveryDate;
+            }
+            set
+            {
+                if(value >= DateTime.Now.AddDays(MinDaysForDelivery))
+                {
+                    deliveryDate = value;
+                }
+                else
+                {
+                    deliveryDate = DateTime.Now.AddDays(MinDaysForDelivery);
+                }
+            }
+        }
         public HomeDelivery(string address, ref Product product)
             : base(address, ref product) 
-        { 
+        {
+            DeliveryType = "Доставка на дом";
+            deliveryDate = DateTime.Now.AddDays(MinDaysForDelivery);
             Price = 500;
+        }
+        public void ChangeDeliveryDate(DateTime NewDate)
+        {
+            DeliveryDate = NewDate;
         }
     }
 
     class PickPointDelivery : Delivery
     {
         public PickPointDelivery(string address, ref Product product)
-            : base(address, ref product) 
-        { 
-            Price = 200;
+            : base(address, ref product)
+        {
+            DeliveryType = "Доставка в пункт выдачи";
+            deliveryDate = DateTime.Now.AddDays(15);
+            Price = (product.Price > 2000) ? 0 : 200;
         }
     }
 
     class ShopDelivery : Delivery
     {
         public ShopDelivery(string address, ref Product product)
-            : base(address, ref product) 
-        { 
-            Price = 0; 
+            : base(address, ref product)
+        {
+            DeliveryType = "Доставка на магазин";
+            deliveryDate = DateTime.Now.AddDays(30);
         }
     }
-    class Program
+    public class Program
     {
         static void Main()
         {
@@ -68,6 +99,7 @@ namespace ModuleSeven
             Delivery delivery = null;
             string enterNum = "";
             Order<Delivery, int> order = null;
+            bool WannaChangeHomeDeliveryDate = default;
 
             //создание ассортимента
             Random For_Products = new();
@@ -92,17 +124,18 @@ namespace ModuleSeven
             {
                 Console.WriteLine(product);
             }
-            //********************************************************************************
-
-            CreateOrder(ref order, Products, delivery, enterProduct, enterNum, enterAddress);
+            //*******************************************************************************
+            CreateOrder(ref order, Products, delivery, enterProduct, enterNum, enterAddress, WannaChangeHomeDeliveryDate);
             Console.WriteLine(order.ToString());
             Console.WriteLine(order.Description);
+            order.DisplayAddress();
 
         }
         //методы для заполнения полей классов, с проверкой корректного ввода 
         //
         static void CreateOrder(ref Order<Delivery, int> order, List<Product> Products, 
-            Delivery delivery, string enterProduct, string enterNum, string enterAddress)
+            Delivery delivery, string enterProduct, string enterNum, string enterAddress,
+            bool WannaChangeHomeDeliveryDate)
         {
             Console.WriteLine("Итак, чтобы совершить заказ, нужно ответить на несколько вопросов!");
             Console.Write("Введите название товара: ");
@@ -136,10 +169,39 @@ namespace ModuleSeven
                         case 3:
                             EnterAddress(ref enterAddress);
                             delivery = new HomeDelivery(enterAddress, ref gottenProduct);
+                            Console.WriteLine($"Текущая дата доставки - {delivery.deliveryDate.ToShortDateString()}," +
+                            $" хотите ли её извенить?(да\\нет)");
+                            EnterYesOrNo(ref WannaChangeHomeDeliveryDate);
+                            if (WannaChangeHomeDeliveryDate == true)
+                            {
+                                delivery.deliveryDate = EnterDate(out DateTime date, delivery);
+                                WannaChangeHomeDeliveryDate = false;
+                            }
+                            else
+                            {
+                                continue;
+                            }
                             break;
                     }
 
                     order = new(delivery, count);
+                    //уточнение даты доставки на дом
+                    if(order.Delivery is HomeDelivery)
+                    {
+                        Console.WriteLine($"Текущая дата доставки - {order.Delivery.deliveryDate.ToShortDateString()}," +
+                            $" хотите ли её извенить?(да\\нет)");
+                        EnterYesOrNo(ref WannaChangeHomeDeliveryDate);
+                        if (WannaChangeHomeDeliveryDate == true)
+                        {
+                            delivery.deliveryDate = EnterDate(out DateTime date, delivery);
+                            WannaChangeHomeDeliveryDate = false;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                        break;
+                    }
                     //уменьшаем количество данного товара на количество в заказе,
                     //после меняем значение Product.IsOrdered на false,
                     //чтобы можно было увелить количество товара
@@ -186,6 +248,30 @@ namespace ModuleSeven
             } while (count == 0);
             enterNum = "";
         }
+        static void EnterYesOrNo(ref bool answer)
+        {
+
+            DltSmthg._setCursorPosition(out int x, out int y);
+            string enter;
+            do
+            {
+                enter = Console.ReadLine();
+                if (!enter.Equals("да", StringComparison.CurrentCultureIgnoreCase) 
+                    && !enter.Equals("нет", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    DltSmthg.deleteWrongEnter(x, y, enter);
+                    enter = null;
+                }
+            } while (enter == null);
+            if (enter.Equals("да", StringComparison.CurrentCultureIgnoreCase))
+            {
+                answer = true;
+            }
+            else
+            {
+                answer = false;
+            }
+        }
         static void EnterAddress(ref string address)
         {
 
@@ -201,6 +287,29 @@ namespace ModuleSeven
                     address = null;
                 }
             } while (address == null);
+        }
+        static DateTime EnterDate<T>(out DateTime date, T order) where T : Delivery
+        {
+            date = order.deliveryDate;
+            if (order is Order<T, int> || order is HomeDelivery)
+            {
+                string enterDate = "";
+
+                Console.WriteLine(order.deliveryDate.ToShortDateString());
+                Console.WriteLine("Введите новую дату, позднее текущей: ");
+
+                do
+                {
+                    DltSmthg._setCursorPosition(out int x, out int y);
+                    enterDate = Console.ReadLine();
+                    if (!DateTime.TryParse(enterDate, out date) || date <= order.deliveryDate)
+                    {
+                        DltSmthg.deleteWrongEnter(x, y, enterDate);
+                        date = order.deliveryDate;
+                    }
+                } while (date == order.deliveryDate);
+            }
+            return date;
         }
     }
 }
