@@ -35,13 +35,14 @@
         {
             //переменная IsOrdered меняет своё значение в конструкторах доставок на true
             //и при завершении формирования заказа в методе CreateOrder в классе Program обратно на false
-            if (!IsOrdered)
+            if (IsOrdered == false)
             {
                 Count += count;
             }
             else
             {
                 Count -= count;
+                IsOrdered = false;
             }
         }
         public override string ToString()
