@@ -195,8 +195,8 @@ namespace ModuleSeven
         }
         static DateTime EnterDate<T>(out DateTime date, T order) where T : Delivery
         {
-            date = order.deliveryDate;
-            if (order is Order<T, int> || order is HomeDelivery)
+            date = order.DeliveryDate;
+            if (order is HomeDelivery)
             {
                 string enterDate = "";
 
@@ -207,12 +207,12 @@ namespace ModuleSeven
                 {
                     DltSmthg._setCursorPosition(out int x, out int y);
                     enterDate = Console.ReadLine();
-                    if (!DateTime.TryParse(enterDate, out date) || date <= order.deliveryDate)
+                    if (!DateTime.TryParse(enterDate, out date) || date <= order.DeliveryDate)
                     {
                         DltSmthg.deleteWrongEnter(x, y, enterDate);
-                        date = order.deliveryDate;
+                        date = order.DeliveryDate;
                     }
-                } while (date == order.deliveryDate);
+                } while (date == order.DeliveryDate);
             }
             return date;
         }
