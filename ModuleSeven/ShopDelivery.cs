@@ -2,8 +2,7 @@
 {
     class ShopDelivery : Delivery
     {
-        public ShopDelivery(string address, ref Product product)
-            : base(address, ref product)
+        public ShopDelivery()
         {
             deliveryType = "Доставка на магазин";
             deliveryDate = DateTime.Now.AddDays(30);

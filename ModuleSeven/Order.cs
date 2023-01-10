@@ -73,7 +73,7 @@
             return $"ID Заказа - {Id}\n" +
                 $"Вы заказали {NumberProducts} {Delivery.Product.Name} " +
                 $"на сумму {price:C2}.\nСтатус заказа - {OrderStatus}.\n" +
-                $"Вид доставки {Delivery.DeliveryType}, доставка {Delivery.DeliveryDate}.";
+                $"Вид доставки {Delivery.DeliveryType}, доставка {Delivery.DeliveryDate.ToShortDateString()}.";
         }
     }
 }
