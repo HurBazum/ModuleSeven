@@ -5,17 +5,18 @@
         public TDelivery Delivery;
         public TStruct Id { get; private set; }
         public int NumberProducts { get; set; }//кол-во заказываемого товара
-        public string Description;//название продукта_заказанное количество
+        public string Description;//название продукта_заказанное количество_дата заказа
         public OrderStatus OrderStatus;//статус заказа
         public string OrderNumber;//ZK_#_DATE
-        
+        public string CustomerName { get; private set; }
         public double Price { get; private set; }
 
         //если количество товара в наличии меньше, чем пользователь хочет заказать,
         //то в заказ включается только то, что есть
-        public Order(object orderId, int chosenDelivery, string address, int numberProducts, ref Product product)
+        public Order(object orderId, int chosenDelivery, string address, int numberProducts, ref Product product, string customerName)
         {
             Id = (TStruct)orderId;
+            CustomerName = customerName;
             switch(chosenDelivery)
             {
                 case 1:
@@ -32,7 +33,7 @@
             NumberProducts = numberProducts;
             Delivery.Address = address;
             
-            Description = $"{Delivery.Product.Name}_{NumberProducts}";
+            Description = $"{Delivery.Product.Name}_{NumberProducts}_{Delivery.DeliveryDate.ToShortDateString()}";
             //расчёт цены заказа в зависимости от наличия скидки и вида доставки
             if(Delivery is PickPointDelivery)
             {

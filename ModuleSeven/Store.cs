@@ -55,7 +55,6 @@ namespace ModuleSeven
                 Console.WriteLine(product);
             }
         }
-        //public Order(object orderId, int chosenDelivery, string address, int numberProducts, ref Product product)
         public void CreateOrder(Customer customer, string enterProduct, string enterNum, 
             string enterAddress, bool WannaChangeHomeDeliveryDate)
         {
@@ -80,20 +79,20 @@ namespace ModuleSeven
                     switch (choice)//создание экземпляра класса доставки, с предварительным вводом адреса
                     {
                         case 1:
-                            OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
-                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct, customer.Name));
+                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct, customer.Name));
                             customer.MyBills.Add(new Bill(customer.MyIntOrders[customer.MyIntOrders.Count - 1].ToString()));
                             break;
 
                         case 2:
-                            OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
-                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct, customer.Name));
+                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct, customer.Name));
                             customer.MyBills.Add(new Bill(customer.MyIntOrders[customer.MyIntOrders.Count - 1].ToString()));
                             break;
                         case 3:
                             EnterAddress(ref enterAddress);//выбор места доставки
-                            OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
-                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct, customer.Name));
+                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct, customer.Name));
                             customer.MyBills.Add(new Bill(customer.MyIntOrders[customer.MyIntOrders.Count - 1].ToString()));
                             Console.WriteLine($"Текущая дата доставки - {OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate.ToShortDateString()}," +
                             $" хотите ли её изменить?(да\\нет)");
@@ -183,7 +182,7 @@ namespace ModuleSeven
                 DltSmthg._setCursorPosition(out int third_x, out int third_y);
 
                 address = Console.ReadLine();
-                if (!Regex.IsMatch(address, @"\b\w\d{1,3}\w{0,1}\b"))
+                if (!Regex.IsMatch(address, @"\b\w\d\w{0,1}\b"))
                 {
                     DltSmthg.deleteWrongEnter(third_x, third_y, address);
                     address = null;
@@ -212,6 +211,35 @@ namespace ModuleSeven
                 } while (date == order.DeliveryDate);
             }
             return date;
+        }
+
+        //ищет покупателя с данным заказом и изменяет статус заказа в счёте и в заказе
+        //при этом заказы со статусом None, т.е. не оплаченные не обрабатываются
+        public void GiveOrderToDeliveryOrSayItDelivered<T>(Order<Delivery, T> order) where T : struct
+        {
+            if (order.OrderStatus != OrderStatus.None)
+            {
+                string customerName = order.CustomerName;
+                var rightCustomer = Customers.Find(x => x.Name == customerName);
+                if (order is Order<Delivery, int>)
+                {
+                    var rightCustomerOrder = rightCustomer.MyIntOrders.Find(x => x.Description == order.Description);
+                    string search = rightCustomerOrder.ToString();
+                    var changedBill = rightCustomer.MyBills.Find(x => x.BillStatus.Contains(search));
+                    changedBill.ChangeBillInfo(rightCustomer, ref rightCustomerOrder);
+                }
+                if (order is Order<Delivery, string>)
+                {
+                    var rightCustomerOrder = rightCustomer.MyStringOrders.Find(x => x.Description == order.Description);
+                    string search = rightCustomerOrder.ToString();
+                    var changedBill = rightCustomer.MyBills.Find(x => x.BillStatus.Contains(search));
+                    changedBill.ChangeBillInfo(rightCustomer, ref rightCustomerOrder);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Операция не возможна!");
+            }
         }
     }
 }

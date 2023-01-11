@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,6 +24,10 @@ namespace ModuleSeven
                 {
                     number = value;
                 }
+                else
+                {
+                    number = "номер не указан";
+                }
             }
         }
         public double Count { get; set; }
@@ -41,27 +46,33 @@ namespace ModuleSeven
             Number = phone_number;
             Count = count;
         }
-        public void PayTheBill(object order_index)
+        //оплата
+        public void PayTheBill(object? order_index)
         {
             if(order_index is int)
             {
                 var order = MyIntOrders.Find(x => x.Id == (int)order_index);
                 MyBills.Add(new(order.ToString()));
-                order.ChangeDeliveryStatus();
-                MyBills[MyBills.Count - 1].SetPayed(this, ref order);
+                MyBills[MyBills.Count - 1].ChangeBillInfo(this, ref order);
             }
             if(order_index is string)
             {
                 var order = MyStringOrders.Find(x => x.Id == (string)order_index);
                 MyBills.Add(new(order.ToString()));
-                order.ChangeDeliveryStatus();
-                MyBills[MyBills.Count - 1].SetPayed(this, ref order);
+                MyBills[MyBills.Count - 1].ChangeBillInfo(this, ref order);
             }
         }
 
         public override string ToString()
         {
-            return $"Здравствуйте, {Name}. У вас на счету {Count}.\n{MyBills[0].ToString()}";
+            return $"Здравствуйте, {Name}, {Number}. У вас на счету {Count:C2}.";
+        }
+        public void ShowBills()
+        {
+            foreach(var bill in MyBills)
+            {
+                Console.WriteLine(bill);
+            }
         }
     }
 }
