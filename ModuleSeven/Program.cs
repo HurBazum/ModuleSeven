@@ -11,7 +11,8 @@ namespace ModuleSeven
     //статус заказа
     enum OrderStatus
     {
-        Build = 0,
+        None = 0,
+        Build,
         OnItsWay,
         CanGet
     }
@@ -31,16 +32,15 @@ namespace ModuleSeven
             store.FillProductsList();
             //вывод ассортимента на экран
             store.ShowProductsList();
-            
+            Customer customer = new Customer("Anton", 30000, "9233397358");
+            store.Customers.Add(customer);
             ////*******************************************************************************
-            store.CreateOrder(enterProduct, enterNum, enterAddress, WannaChangeHomeDeliveryDate);
+            store.CreateOrder(store.Customers[0], enterProduct, enterNum, enterAddress, WannaChangeHomeDeliveryDate);
             Console.WriteLine(store.OrdersIntId[0].ToString());
             Console.WriteLine(store.OrdersIntId[0].Description);
             store.OrdersIntId[0].DisplayAddress();
-            foreach (Product product in store.Products)
-            {
-                Console.WriteLine(product);
-            }
+            store.Customers[0].PayTheBill(0);
+            Console.WriteLine(store.Customers[0].ToString());
         }
     }
 }

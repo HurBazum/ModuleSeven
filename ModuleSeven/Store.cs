@@ -56,7 +56,7 @@ namespace ModuleSeven
             }
         }
         //public Order(object orderId, int chosenDelivery, string address, int numberProducts, ref Product product)
-        public void CreateOrder(string enterProduct, string enterNum, 
+        public void CreateOrder(Customer customer, string enterProduct, string enterNum, 
             string enterAddress, bool WannaChangeHomeDeliveryDate)
         {
             Console.WriteLine("Итак, чтобы совершить заказ, нужно ответить на несколько вопросов!");
@@ -80,24 +80,28 @@ namespace ModuleSeven
                     switch (choice)//создание экземпляра класса доставки, с предварительным вводом адреса
                     {
                         case 1:
-                            EnterAddress(ref enterAddress);//выбор места доставки
                             OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            customer.MyBills.Add(new Bill(customer.MyIntOrders[customer.MyIntOrders.Count - 1].ToString()));
                             break;
 
                         case 2:
-                            EnterAddress(ref enterAddress);//выбор места доставки
                             OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            customer.MyBills.Add(new Bill(customer.MyIntOrders[customer.MyIntOrders.Count - 1].ToString()));
                             break;
-
                         case 3:
                             EnterAddress(ref enterAddress);//выбор места доставки
                             OrdersIntId.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            customer.MyIntOrders.Add(new Order<Delivery, int>(OrdersIntId.Count, choice, enterAddress, count, ref gottenProduct));
+                            customer.MyBills.Add(new Bill(customer.MyIntOrders[customer.MyIntOrders.Count - 1].ToString()));
                             Console.WriteLine($"Текущая дата доставки - {OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate.ToShortDateString()}," +
                             $" хотите ли её изменить?(да\\нет)");
                             EnterYesOrNo(ref WannaChangeHomeDeliveryDate);
                             if (WannaChangeHomeDeliveryDate == true)
                             {
                                 OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate = EnterDate(out DateTime date, OrdersIntId[OrdersIntId.Count - 1].Delivery);
+                                customer.MyIntOrders[customer.MyIntOrders.Count - 1].Delivery.DeliveryDate = OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate; 
                                 WannaChangeHomeDeliveryDate = false;
                             }
                             else

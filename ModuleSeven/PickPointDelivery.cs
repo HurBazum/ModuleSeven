@@ -9,7 +9,7 @@
         public void CheckDeliveryPrice()
         {
             DeliveryDate = DateTime.Now.AddDays(15);
-            Price = (Product.Price > 2000) ? 0 : 2000;
+            Price = (Product.Price > 2000) ? 0 : 200;
         }
             
     }

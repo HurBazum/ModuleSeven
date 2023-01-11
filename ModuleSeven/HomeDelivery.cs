@@ -21,6 +21,7 @@
                 }
             }
         }
+        
         public HomeDelivery(string address, ref Product product)
             : base(address, ref product)
         {
