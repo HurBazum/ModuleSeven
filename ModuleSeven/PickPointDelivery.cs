@@ -5,7 +5,7 @@
         public PickPointDelivery()
         {
             deliveryType = "Доставка в пункт выдачи";
-            DeliversDays = 15;
+            DeliversDays = 19;
             DeliveryDate = DateTime.Now.AddDays(DeliversDays);//устанавливается дата, когда товар можно будет забрать
             PickPointAdress = new string[2] { "Фрунзе, 2", "Ленина, 111" };
             Address = PickPointAdress[0];

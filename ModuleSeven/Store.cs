@@ -201,14 +201,14 @@ namespace ModuleSeven
                                 customer.MyBills.Add(new Bill(customer.MyStringOrders[customer.MyStringOrders.Count - 1].ToString()));
 
                                 Console.WriteLine($"Текущая дата доставки - " +
-                                    $"{OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate.ToShortDateString()}," +
+                                    $"{OrdersStringId[OrdersStringId.Count - 1].Delivery.DeliveryDate.ToShortDateString()}," +
                                         $" хотите ли её изменить?(да\\нет)");
                                 EnterYesOrNo(ref WannaChangeHomeDeliveryDate);
                                 //корректировка даты доставки на дом
                                 if (WannaChangeHomeDeliveryDate == true)
                                 {
-                                    OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate = EnterDate(out DateTime date, OrdersIntId[OrdersIntId.Count - 1].Delivery);
-                                    customer.MyIntOrders[customer.MyIntOrders.Count - 1].Delivery.DeliveryDate = OrdersIntId[OrdersIntId.Count - 1].Delivery.DeliveryDate;
+                                    OrdersStringId[OrdersStringId.Count - 1].Delivery.DeliveryDate = EnterDate(out DateTime date, OrdersStringId[OrdersIntId.Count - 1].Delivery);
+                                    customer.MyIntOrders[customer.MyStringOrders.Count - 1].Delivery.DeliveryDate = OrdersStringId[OrdersStringId.Count - 1].Delivery.DeliveryDate;
                                     WannaChangeHomeDeliveryDate = false;
                                 }
                             }

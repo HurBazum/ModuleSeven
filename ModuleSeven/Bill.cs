@@ -32,8 +32,7 @@ namespace ModuleSeven
                 order.Delivery.Product.IsOrdered = true; 
                 order.Delivery.Product.ChangeCount(order.NumberProducts);
                 //изменяет дату доставки, т.к. заказ мог быть сформирован, раньше, чем оплачен
-                order.Delivery.DeliveryDate = DateTime.Now.AddDays(order.Delivery.DeliversDays);
-                                                                                                
+                order.Delivery.DeliveryDate = DateTime.Now.AddDays(order.Delivery.DeliversDays);                                                                               
                 BillStatus = "Оплачено\n" + order.ToString();
             }
             else if (BillStatus.Contains("Оплачено\n"))

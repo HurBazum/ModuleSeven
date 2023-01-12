@@ -37,37 +37,42 @@ namespace ModuleSeven
             ////*******************************************************************************
             ///создаем заказ, он добавляется и в магазин, и покупателю, также у покупателя появляется чек
             ///с статусом "Не оплачено" + order.ToString()
+            Console.WriteLine("\nПокупатель и его счёт:");
+            Console.WriteLine(store.Customers[0].ToString());
+            Console.WriteLine();
             store.CreateOrder(id, store.Customers[0], store.enterProduct, store.enterNum, store.enterAddress, store.WannaChangeHomeDeliveryDate);
             if (id is int)
             {
-
-                //Console.WriteLine(store.OrdersIntId[0].ToString());
-                Console.WriteLine(store.OrdersIntId[0].Description);
-                store.OrdersIntId[0].DisplayAddress();
+                Console.WriteLine("вывод информации по заказу со статусом None\n");
                 Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
-                //оплачиваем заказ, т.е. меняем "Не оплачено" на "оплачено", также статус заказа с None на Build
+                Console.WriteLine("\nоплачиваем заказ, т.е. меняем \"Не оплачено\" на \"оплачено\", также статус заказа с None на Build\n");
                 store.Customers[0].PayTheBill(store.Customers[0].MyIntOrders[0].Id);
-                //смотрим изменения customer(состояние счёта), после удачной оплаты
+                Console.WriteLine("выводим оплаченный чек\n");
+                Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
+                Console.WriteLine("\nсмотрим изменения customer(состояние счёта), после удачной оплаты\n");
                 Console.WriteLine(store.Customers[0].ToString());
-                //выводим оплаченный чек
-                Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
-                //изменяем информацию в чеке и в заказе, а точнее OrderStatus на OnItsWay или CanGet
+                Console.WriteLine("\nизменяем информацию в чеке и в заказе, а точнее OrderStatus на OnItsWay или CanGet\n");
                 store.GiveOrderToDeliveryOrSayItDelivered(store.Customers[0].MyIntOrders[0]);
-                //опять смотрим изменения в чеке
+                Console.WriteLine("опять смотрим изменения в чеке\n");
                 Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
+                Console.WriteLine();
             }
             //тоже самое с заказом со строковым ID
             if(id is string && !String.IsNullOrWhiteSpace((id as string)))
             {
-                Console.WriteLine(store.OrdersStringId[0].ToString());
-                Console.WriteLine(store.OrdersStringId[0].Description);
-                store.OrdersStringId[0].DisplayAddress();
+                Console.WriteLine("вывод информации по заказу со статусом None\n");
                 Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
+                Console.WriteLine("\nоплачиваем заказ, т.е. меняем \"Не оплачено\" на \"оплачено\", также статус заказа с None на Build\n");
                 store.Customers[0].PayTheBill(store.Customers[0].MyStringOrders[0].Id);
+                Console.WriteLine("выводим оплаченный чек\n");
+                Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
+                Console.WriteLine("\nсмотрим изменения customer(состояние счёта), после удачной оплаты\n");
                 Console.WriteLine(store.Customers[0].ToString());
-                Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
+                Console.WriteLine("\nизменяем информацию в чеке и в заказе, а точнее OrderStatus на OnItsWay или CanGet\n");
                 store.GiveOrderToDeliveryOrSayItDelivered(store.Customers[0].MyStringOrders[0]);
+                Console.WriteLine("опять смотрим изменения в чеке\n");
                 Console.WriteLine(store.Customers[0].MyBills[store.Customers[0].MyBills.Count - 1].ToString());
+                Console.WriteLine();
             }
             //вывод обновлённого списка товаров, после оплаты заказа
             store.ShowProductsList();

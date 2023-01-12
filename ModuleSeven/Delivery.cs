@@ -1,4 +1,6 @@
-﻿namespace ModuleSeven
+﻿using System;
+
+namespace ModuleSeven
 {
     abstract class Delivery
     {
@@ -8,7 +10,7 @@
         public string DeliveryType { get { return deliveryType; } }
         public double Price;
         public DateTime deliveryDate;
-        int DaysForDeliver;//сколько осталось дней до доставки товара
+        public int DaysForDeliver;//сколько осталось дней до доставки товара
         public virtual DateTime DeliveryDate { get; set; }//переопределяется в HomeDelivery
         public Product Product { get; set; }
         public string[] ShopAddress { get; set; }//возможные адреса магазинов
@@ -22,15 +24,16 @@
         //и возвращает сообщение об оставшихся днях. используется для Order.ToString();
         public string DaysForDelivery()
         {
-            if (DateTime.Now.Month == DeliveryDate.Month)//если доставка планируется в текущем месяце
+            ///////???????????
+            if (DateTime.Now.Month < deliveryDate.Month)//если доставка планируется в следующем
             {
-                DaysForDeliver = deliveryDate.Day - DateTime.Now.Day;
+                DaysForDeliver = DateTime.Now.Day - deliveryDate.Day + DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
             }
-            if (DateTime.Now.Month < DeliveryDate.Month)//если доставка планируется в следующем
+            else//если доставка планируется в текущем месяце
             {
-                DaysForDeliver = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month) - DateTime.Now.Day + deliveryDate.Day;
+                DaysForDeliver = DateTime.Now.Day - deliveryDate.Day;
             }
-            return $"Заказ доставят, через {DaysForDeliver} дней.";
+            return $"Заказ доставят через {DaysForDeliver} дней.";
         }
         public virtual void ShowAvailableAdress()//Переопределяется в ShopDelivery и PickPointDelivery 
         {
