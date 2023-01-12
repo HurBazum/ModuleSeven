@@ -2,7 +2,11 @@
 {
     class HomeDelivery : Delivery
     {
-        private int MinDaysForDelivery = 10;
+        private int MinDaysForDelivery = 10;//минимальное количество дней для доставки, нужно для ограничения изменения даты доставки
+        /// <summary>
+        /// для возможности перенесения даты доставки по договорённости с курьером,
+        /// но пока курьера нет . . .
+        /// </summary>
         public override DateTime DeliveryDate
         {
             get
@@ -21,20 +25,16 @@
                 }
             }
         }
-        
-        public HomeDelivery(string address, ref Product product)
-            : base(address, ref product)
-        {
-            deliveryType = "Доставка на дом";
-            deliveryDate = DateTime.Now.AddDays(MinDaysForDelivery);
-            Price = 500;
-        }
         public HomeDelivery()
         {
             deliveryType = "Доставка на дом";
             deliveryDate = DateTime.Now.AddDays(MinDaysForDelivery);
             Price = 500;
         }
+        /// <summary>
+        /// изменение даты доставки, через метод
+        /// </summary>
+        /// <param name="NewDate"></param>
         public void ChangeDeliveryDate(DateTime NewDate)
         {
             DeliveryDate = NewDate;

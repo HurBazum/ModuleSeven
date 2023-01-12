@@ -1,9 +1,10 @@
 ﻿namespace ModuleSeven
 {
-    class Order<TDelivery, TStruct> where TDelivery : Delivery
+    class Order<TDelivery, TStruct> 
+        where TDelivery : Delivery 
     {
         public TDelivery Delivery;
-        public TStruct Id { get; private set; }
+        public TStruct? Id { get; private set; }
         public int NumberProducts { get; set; }//кол-во заказываемого товара
         public string Description;//название продукта_заказанное количество_дата заказа
         public OrderStatus OrderStatus;//статус заказа
@@ -32,7 +33,7 @@
             Delivery.Product = product;
             NumberProducts = numberProducts;
             Delivery.Address = address;
-            
+            //для более точного поиска заказов в списках
             Description = $"{Delivery.Product.Name}_{NumberProducts}_{Delivery.DeliveryDate.ToShortDateString()}";
             //расчёт цены заказа в зависимости от наличия скидки и вида доставки
             if(Delivery is PickPointDelivery)
@@ -44,9 +45,6 @@
                     Delivery.Price : (Delivery.Product.Price * NumberProducts) + Delivery.Price;
             //заказ поступил в работу
             OrderStatus = OrderStatus.None;
-            product.IsOrdered = true;
-            product.ChangeCount(numberProducts);
-
         }
 
         public void DisplayAddress()
@@ -62,6 +60,7 @@
                 
             }
         }
+        //изменение даты доставки на дом
         public void ChangeDate(DateTime NewDeliveryDate)
         {
             if (Delivery is HomeDelivery)
@@ -72,9 +71,10 @@
         public override string ToString()
         {
             return $"ID Заказа - {Id}\t" + $"{OrderNumber}\n" +
-                $"Вы заказали {NumberProducts} {Delivery.Product.Name} " +
-                $"на сумму {Price:C2}.\nСтатус заказа - {OrderStatus}.\n" +
-                $"Вид доставки {Delivery.DeliveryType}, доставка {Delivery.DeliveryDate.ToShortDateString()}.";
+                   $"Вы заказали {NumberProducts} {Delivery.Product.Name} " +
+                   $"на сумму {Price:C2}.\nСтатус заказа - {OrderStatus}.\n" +
+                   $"Вид доставки {Delivery.DeliveryType}, доставка {Delivery.DeliveryDate.ToShortDateString()}." +
+                   $"\n{Delivery.DaysForDelivery()} Адрес доставки - {Delivery.Address}.";
         }
     }
 }

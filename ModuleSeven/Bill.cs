@@ -17,17 +17,24 @@ namespace ModuleSeven
             BillStatus = "Ожидает оплаты\n" + order.ToString();
             IsPayed = false;
         }
-        //public void ChangeBillInfo<T>(Customer c, ref Order<Delivery, T> order) where T : struct
-        //не получается...
-        public void ChangeBillInfo(Customer c, ref Order<Delivery, int> order)
+        //изменяет информацию о статусе заказа в чеке
+        //1 - заказ ещё не оплачен(но есть возможность это сделать)
+        //2 - заказ уже оплачен(но не получен)
+        //3 - недостаточно средств
+        public void ChangeBillInfo<T>(Customer c, ref Order<Delivery, T> order)
         {
             if (c.Count >= order.Price && IsPayed == false)
             {
-                IsPayed = true;
+                IsPayed = true;//заказ оплачен
                 c.Count -= order.Price;
                 order.ChangeDeliveryStatus();
+                //уменьшение кол-ва товаров в магазине происходит, только после оплаты
+                order.Delivery.Product.IsOrdered = true; 
+                order.Delivery.Product.ChangeCount(order.NumberProducts);
+                //изменяет дату доставки, т.к. заказ мог быть сформирован, раньше, чем оплачен
+                order.Delivery.DeliveryDate = DateTime.Now.AddDays(order.Delivery.DeliversDays);
+                                                                                                
                 BillStatus = "Оплачено\n" + order.ToString();
-                c.MyBills.Add(this);
             }
             else if (BillStatus.Contains("Оплачено\n"))
             {
@@ -36,26 +43,7 @@ namespace ModuleSeven
             }
             else if(c.Count < order.Price)
             {
-                BillStatus = $"Недостаточно средств, внесите на счёт ещё {order.Price - c.Count:C2}";
-            }
-        }
-        public void ChangeBillInfo(Customer c, ref Order<Delivery, string> order)
-        {
-            if (c.Count >= order.Price && IsPayed == false)
-            {
-                IsPayed = true;
-                c.Count -= order.Price;
-                order.ChangeDeliveryStatus();
-                BillStatus = "Оплачено\n" + order.ToString();
-            }
-            if (BillStatus.Contains("Оплачено\n"))
-            {
-                order.ChangeDeliveryStatus();
-                BillStatus = "Оплачено\n" + order.ToString();
-            }
-            else if (c.Count < order.Price)
-            {
-                BillStatus = $"Недостаточно средств, внесите на счёт ещё {order.Price - c.Count:C2}";
+                BillStatus = $"Недостаточно средств, внесите на счёт ещё {order.Price - c.Count:C2}" + order.ToString();
             }
         }
         public override string ToString()

@@ -4,7 +4,7 @@
     {
         //имена продукции создаются рандомно
         Random ProductRandomName = new Random();
-        string name;
+        string name;//название товара
         public string Name
         {
             get { return name; }
@@ -31,10 +31,10 @@
             Count = count;
             Discount = discount;
         }
+        //уменьшает количество товара, при оплате в классе Bill
+        //также есть возможность увеличивать это кол-во
         public void ChangeCount(int count)
         {
-            //переменная IsOrdered меняет своё значение в конструкторах доставок на true
-            //и при завершении формирования заказа в методе CreateOrder в классе Program обратно на false
             if (IsOrdered == false)
             {
                 Count += count;
